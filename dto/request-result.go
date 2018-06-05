@@ -291,3 +291,27 @@ func (pointer *RequestResult) checkResponse() error {
 	return nil
 
 }
+
+func (pointer *RequestResult) ToLogs() (*[]Log, error) {
+	if err := pointer.checkResponse(); err != nil {
+		return nil, err
+	}
+
+	result := (pointer).Result.([]interface{})
+
+	if len(result) == 0 {
+		return nil, customerror.EMPTYRESPONSE
+	}
+
+	logs := &[]Log{}
+
+	marshal, err := json.Marshal(result)
+
+	if err != nil {
+		return nil, customerror.UNPARSEABLEINTERFACE
+	}
+
+	err = json.Unmarshal([]byte(marshal), logs)
+
+	return logs, err
+}

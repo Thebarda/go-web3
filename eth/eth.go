@@ -759,3 +759,29 @@ func (eth *Eth) GetUncleCountByBlockNumber(quantity types.ComplexIntParameter) (
 
 	return pointer.ToComplexIntResponse()
 }
+
+// GetFilterChanges - Polling method for a filter, which returns an array of logs which occurred since last poll.
+// Reference: https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterchanges
+// Parameters:
+//    - filter, string - the filter id.
+// Returns:
+//    - logs, Array - Array of log objects, or an empty array if nothing has changed since last poll.
+//    - error
+func (eth *Eth) GetFilterChanges(filter string) (*[]dto.Log, error) {
+	if !strings.HasPrefix(filter, "0x") {
+		filter = "0x" + filter
+	}
+
+	params := make([]string, 1)
+	params[0] = filter
+
+	pointer := &dto.RequestResult{}
+
+	err := eth.provider.SendRequest(pointer, "eth_getFilterChanges", params)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pointer.ToLogs()
+}
